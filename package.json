@@ -1,0 +1,20 @@
+{
+  "name": "covid-telegram-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon bot.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.9",
+    "telegraf": "^4.4.0",
+    "telegram-keyboard": "^2.2.6"
+  }
+}
