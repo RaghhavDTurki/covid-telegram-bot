@@ -6,6 +6,10 @@
   "scripts": {
     "start": "nodemon bot.js"
   },
+  "engines": {
+    "node": "16.4.2",
+    "npm": "7.17.0"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

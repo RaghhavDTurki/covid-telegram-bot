@@ -1,37 +1,30 @@
-const countries = require("./countries.json");
-const { Telegraf } = require('telegraf');
+// Setting Up Server
+const express = require("express")
+const app = express();
 const dotenv = require("dotenv");
-const axios = require('axios');
-const { Keyboard } = require("telegram-keyboard");
 
 dotenv.config({path:"config.env"});
+
+const PORT = process.env.PORT || 3000;
+const URL = process.env.URL || "https://covid-telegram-bot1991.herokuapp.com";
+
+
+// Telegraf Imports
+const { Telegraf } = require('telegraf');
+
+// Imports for Bot Commmands
+const countries = require("./countries.json");
+const globalData = require("./actions/globalData").getGlobalData;
+const countrySearch = require("./actions/countryData").countrySearch;
+const getCountryData = require("./actions/countryData").getCountryData;
+
 
 const telegram_bot_id = process.env.TELEGRAM_BOT_ID;
 
 const bot = new Telegraf(telegram_bot_id);
+bot.telegram.setWebhook(`${URL}/bot${telegram_bot_id}`)
+app.use(bot.webhookCallback(`/bot${telegram_bot_id}`))
 
-function binarySearch(items, value){
-    value = value.toLowerCase();
-    var startIndex  = 0,
-        stopIndex   = items.length - 1,
-        middle      = Math.floor((stopIndex + startIndex)/2);
-
-    while(items[middle].toLowerCase() != value && startIndex < stopIndex){
-
-        //adjust search area
-        if (value < items[middle].toLowerCase()){
-            stopIndex = middle - 1;
-        } else if (value > items[middle].toLowerCase()){
-            startIndex = middle + 1;
-        }
-
-        //recalculate middle
-        middle = Math.floor((stopIndex + startIndex)/2);
-    }
-
-    //make sure it's the right value
-    return (items[middle].toLowerCase() != value) ? -1 : middle;
-}
 
 bot.start((ctx) => {
 
@@ -46,32 +39,8 @@ This bot can show you the data of Novel Coronavirus (COVID-19) cases, provided b
 	bot.telegram.sendMessage(ctx.chat.id, message1)
 });
 
-async function  getGlobalData()
-{
-	let data = await axios.get("https://disease.sh/v3/covid-19/historical/all?lastdays=2")
-	data = data.data;
-	let queryDate = Object.keys(data["cases"])[1];
-	let cases = Object.values(data["cases"])[1];
-	let recovered = Object.values(data["recovered"])[1];
-	let deaths = Object.values(data["deaths"])[1];
-	let added = cases - Object.values(data["cases"])[0];
-	return {queryDate, added ,cases, recovered, deaths};
-}
-
-async function getCountryData(country)
-{
-	let data = await axios.get(`https://disease.sh/v3/covid-19/historical/${country}?lastdays=2`);
-	data = data.data;
-	let queryDate = Object.keys(data["timeline"]["cases"])[1];
-	let cases = Object.values(data["timeline"]["cases"])[1];
-	let recovered = Object.values(data["timeline"]["recovered"])[1];
-	let deaths = Object.values(data["timeline"]["deaths"])[1];
-	let added = cases - Object.values(data["timeline"]["cases"])[0];
-	return {queryDate, added ,cases, recovered, deaths};
-}
-
 bot.hears("total", (ctx) => {
-	getGlobalData()
+	globalData()
 	.then(data => {
 		let qDate = data["queryDate"];
 		let globalAdded = data["added"];
@@ -101,7 +70,7 @@ Active: ${globalActive}`
 
 bot.on('text', (ctx) => {
 	let userMessage = ctx.message.text;
-	let countryIndex = binarySearch(countries, userMessage);
+	let countryIndex = countrySearch(countries, userMessage);
 	if(countryIndex != -1)
 	{
 		getCountryData(countries[countryIndex])
@@ -128,7 +97,17 @@ Active: ${countryActive}`
 	}
 	else
 	{
-		// let message = 
+		let message = `No data found! 
+Please try again with a valid command.`
+		bot.telegram.sendMessage(ctx.chat.id, message);
 	}
 })
-bot.launch();
+
+
+app.get(`/`, (req,res) => {
+	res.send("Bot is running");
+});
+
+app.listen(PORT, () => {
+	console.log(`Server is running on port ${PORT}`);
+});

@@ -1,4 +1,5 @@
-const countries = require("./countries.json");
+const axios = require("axios");
+
 function binarySearch(items, value){
     value = value.toLowerCase();
     var startIndex  = 0,
@@ -22,6 +23,18 @@ function binarySearch(items, value){
     return (items[middle].toLowerCase() != value) ? -1 : middle;
 }
 
-console.log(binarySearch(countries, "notinarray"));
-// console.log(countries[71]);
-console.log(typeof countries);
+async function getCountryData(country)
+{
+	let data = await axios.get(`https://disease.sh/v3/covid-19/historical/${country}?lastdays=2`);
+	data = data.data;
+	let queryDate = Object.keys(data["timeline"]["cases"])[1];
+	let cases = Object.values(data["timeline"]["cases"])[1];
+	let recovered = Object.values(data["timeline"]["recovered"])[1];
+	let deaths = Object.values(data["timeline"]["deaths"])[1];
+	let added = cases - Object.values(data["timeline"]["cases"])[0];
+	return {queryDate, added ,cases, recovered, deaths};
+}
+module.exports = {
+    countrySearch : binarySearch,
+    getCountryData : getCountryData
+}
