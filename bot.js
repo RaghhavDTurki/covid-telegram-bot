@@ -25,6 +25,8 @@ const bot = new Telegraf(telegram_bot_id);
 bot.telegram.setWebhook(`${URL}/bot${telegram_bot_id}`)
 app.use(bot.webhookCallback(`/bot${telegram_bot_id}`))
 
+let numberBeautify = Intl.NumberFormat('en-US');
+let NumberFormat = numberBeautify.format;
 
 bot.start((ctx) => {
 
@@ -43,11 +45,11 @@ bot.hears("total", (ctx) => {
 	globalData()
 	.then(data => {
 		let qDate = data["queryDate"];
-		let globalAdded = data["added"];
-		let globalCases = data["cases"];
-		let globalRecovered = data["recovered"];
-		let globalDeaths = data["deaths"];
-		let globalActive = globalCases - globalRecovered - globalDeaths;
+		let globalAdded = NumberFormat(data["added"]);
+		let globalCases = NumberFormat(data["cases"]);
+		let globalRecovered = NumberFormat(data["recovered"]);
+		let globalDeaths = NumberFormat(data["deaths"]);
+		let globalActive = NumberFormat(globalCases - globalRecovered - globalDeaths);
 		
 		let message = `Here's the COVID-19 numbers in the world: 
 📆: ${qDate}
@@ -76,11 +78,11 @@ bot.on('text', (ctx) => {
 		getCountryData(countries[countryIndex])
 		.then(data => {
 			let qDate = data["queryDate"];
-			let countryAdded = data["added"];
-			let countryCases = data["cases"];
-			let countryRecovered = data["recovered"];
-			let countryDeaths = data["deaths"];
-			let countryActive = countryCases - countryRecovered - countryDeaths;
+			let countryAdded = NumberFormat(data["added"]);
+			let countryCases = NumberFormat(data["cases"]);
+			let countryRecovered = NumberFormat(data["recovered"]);
+			let countryDeaths = NumberFormat(data["deaths"]);
+			let countryActive = NumberFormat(countryCases - countryRecovered - countryDeaths);
 		
 			let message = `Here's the COVID-19 numbers in ${countries[countryIndex]}: 
 📆: ${qDate}
