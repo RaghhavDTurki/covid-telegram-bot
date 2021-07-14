@@ -35,6 +35,8 @@ This bot can show you the data of Novel Coronavirus (COVID-19) cases, provided b
 
 	let message1 = `- Enter "total" to get the global numbers.
 - Enter a country to get the numbers of the specified country, for example: "India".
+- Enter "help" to get this starting message again.
+- Enter "covid" to get the latest covid symptoms 
 	`
 
 	bot.telegram.sendMessage(ctx.chat.id, message)
@@ -69,6 +71,42 @@ Active: ${globalActive}`
 
 });
 
+bot.hears("help", (ctx) => {
+	let message = `Welcome to the COVID-19 Bot.
+This bot can show you the data of Novel Coronavirus (COVID-19) cases, provided by JHU CSSE.`
+
+	let message1 = `- Enter "total" to get the global numbers.
+- Enter a country to get the numbers of the specified country, for example: "India".
+- Enter "help" to get this starting message again.
+- Enter "covid" to get the latest covid symptoms 
+	`
+
+	bot.telegram.sendMessage(ctx.chat.id, message)
+	bot.telegram.sendMessage(ctx.chat.id, message1)
+})
+
+bot.hears("covid", (ctx) => {
+	let message = `- Most common symptoms:
+1. Fever
+2. Dry cough
+3. Tiredness
+- Less common symptoms:
+1. Aches and Pains
+2. Sore throat
+3. Diarrhoea
+4. Conjunctivitis
+5. Headache
+6. Loss of taste or smell
+7. Rash on skin, or discolouration of fingers or toes
+- Serious symptoms:
+1. Difficulty breathing or shortness of breath
+2. Chest pain or pressure
+3. Loss of speech or movement
+- Seek immediate medical attention if you have serious symptoms. Always call before visiting your doctor or health facility.
+- People with mild symptoms who are otherwise healthy should manage their symptoms at home.
+- On average it takes 5–6 days from when someone is infected with the virus for symptoms to show, however it can take up to 14 days.`
+	bot.telegram.sendMessage(ctx.chat.id, message);
+})
 
 bot.on('text', (ctx) => {
 	let userMessage = ctx.message.text;
